@@ -1,11 +1,10 @@
 # Урок 1. DBA
 
-## [sqlite]SQlite[/sqlite]
+## [sqlite]
 
-## [mysql]MySql[/mysql]
+## [mysql]
 
-## [pgsql]PgSql[/pgsql]
-
+## [pgsql]
 
 [sqlite]:/lesson1/sqlite.md
 [mysql]:/lesson1/mysql.md
