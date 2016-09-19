@@ -17,15 +17,16 @@ CREATE TABLE `books` (
   `author` text(255),
   `price` integer
 );
-
+```
+```sql
 CREATE TABLE `publishers` (
   `id` integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   `name` text(255) NOT NULL,
   `city` text(255) NOT NULL
 );
 ```
-##### Вставляем данные в таблицу books
-
+#### Вставляем данные в таблицу books
+```sql
 INSERT INTO `books` (`title`, `year_published`, `year_written`, `author`, `price`)
 VALUES ('Война и Мир', 1996, 1867, 'Лев Толстой', 1200);
 
@@ -82,9 +83,9 @@ VALUES ('Записки на манжетах', 1988, 'Михаил Булгак
 
 INSERT INTO `books` (`title`, `year_published`, `author`, `price`)
 VALUES ('Собачье сердце', 1999, 'Михаил Булгаков', 250);
-
-##### Вставляем информацию об издательствах
-
+```
+#### Вставляем информацию об издательствах
+```sql
 INSERT INTO `publishers` (`name`, `city`)
 VALUES ('Питер', 'СПб.');
 
@@ -117,29 +118,38 @@ VALUES ('Радуга', 'М.');
 
 INSERT INTO `publishers` (`name`, `city`)
 VALUES ('Художественная литература. Москва', 'М.');
+```
+#### Запросы на выборку (Задание 3)
 
-##### Запросы на выборку
-
-1. SELECT * FROM `books` WHERE `author` = 'Лев Толстой';
-
-2. SELECT * FROM `books` WHERE `price` <= 500;
-
-3. SELECT `books`.`title`, `books`.`year_published` FROM `books` WHERE `author` = 'Михаил Булгаков' ORDER BY `year_published`; или
+1. Все книги автора - Лев Толстой
+```sql
+SELECT * FROM `books` WHERE `author` = 'Лев Толстой';
+```
+2. Все книги ценой не более 500 рублей
+```sql
+SELECT * FROM `books` WHERE `price` <= 500;
+```
+3. Заглавия книг и год издания автора - Михаил Булгаков, отсортированные по дате публикации, в двух вариантах - по возрастанию(по умолчанию)
+и по убыванию
+```sql
+SELECT `books`.`title`, `books`.`year_published` FROM `books` WHERE `author` = 'Михаил Булгаков' ORDER BY `year_published`; или
 SELECT `books`.`title`, `books`.`year_published` FROM `books` WHERE `author` = 'Михаил Булгаков' ORDER BY `year_published` DESC;
-
-4. SELECT `books`.`author` FROM `books` WHERE `year_published` >= 1990 AND `year_published` < 2000 GROUP BY `author`;
-
+```
+4. Имена авторов книг вышедших в с 1990 по 1999 годы (включительно). Применена группировка, чтобы получить список без повторов.
+```sql
+SELECT `books`.`author` FROM `books` WHERE `year_published` >= 1990 AND `year_published` < 2000 GROUP BY `author`;
+```
 
 ###mySql
 
 Создаём базу данных c названием dba:
-
+```sql
 CREATE DATABASE `dba` COLLATE 'utf8_general_ci';
-
+```
 Создаём таблицы, идентично со sqllite с той лишь разницей, что в mysql есть специальный тип для поля id SERIAL, его и применим.
 Также вместо типа text (который также есть и в mysql) будем использовать специальный тип - строку с ограниченной длиной - varchar
 
-
+```sql
 CREATE TABLE `books` (
   `id` serial,
   `title` varchar(500) NOT NULL,
@@ -148,29 +158,39 @@ CREATE TABLE `books` (
   `author` varchar(255),
   `price` integer
 );
-
+```
+```sql
 CREATE TABLE `publishers` (
   `id` serial,
   `name` varchar(255) NOT NULL,
   `city` varchar(255) NOT NULL
 );
-
+```
 Заполняем поля данными. Запросы точно такие же как в sqlite.
 
 #### Запросы на выборку
 
-1. SELECT * FROM `books` WHERE `author` = 'Иван Тургенев';
-
-2. SELECT * FROM `books` WHERE `price` <= 500;
-
-3. SELECT `books`.`title`, `books`.`year_published` FROM `books` WHERE `author` = 'Лев Толстой';
-
-4. SELECT `books`.`author` FROM `books` WHERE `year_published` >= 1990 AND `year_published` < 2000 GROUP BY `author`;
+1. Все книги автора - Иван Тургенев
+```sql
+SELECT * FROM `books` WHERE `author` = 'Иван Тургенев';
+```
+2. Все книги ценой не более 500 рублей
+```sql
+SELECT * FROM `books` WHERE `price` <= 500;
+```
+3. Заглавия книг и год издания автора - Лев Толстой, отсортированные по дате публикации, в двух вариантах - по возрастанию(по умолчанию)
+```sql
+SELECT `books`.`title`, `books`.`year_published` FROM `books` WHERE `author` = 'Лев Толстой';
+```
+4. Имена авторов книг вышедших в с 1990 по 1999 годы (включительно). Применена группировка, чтобы получить список без повторов.
+```sql
+SELECT `books`.`author` FROM `books` WHERE `year_published` >= 1990 AND `year_published` < 2000 GROUP BY `author`;
+```
 
 ###pgSql
 
 ####Создаём базу данных:
-
+```sql
 CREATE DATABASE postgres
   WITH OWNER = postgres
        ENCODING = 'UTF8'
@@ -178,9 +198,9 @@ CREATE DATABASE postgres
        LC_COLLATE = 'Russian_Russia.1251'
        LC_CTYPE = 'Russian_Russia.1251'
        CONNECTION LIMIT = -1;
-
+```
 ####Создаём таблицы
-
+```sql
 CREATE TABLE "public"."books"
 (
   "id" serial,
@@ -190,17 +210,18 @@ CREATE TABLE "public"."books"
   "author" character varying(255),
   "price" integer
 );
-
+```
+```sql
 CREATE TABLE "public"."publishers"
 (
   "id" serial,
   "name" character varying(255) NOT NULL,
   "city" character varying(255) NOT NULL
 );
-
+```
 ####Наполняем таблицы данными
 Отличие только в синтаксисе символов экранирования
-
+```sql
 INSERT INTO "books" ("title", "year_published", "year_written", "author", "price")
 VALUES ('Война и Мир', 1996, 1867, 'Лев Толстой', 1200);
 
@@ -257,9 +278,9 @@ VALUES ('Записки на манжетах', 1988, 'Михаил Булгак
 
 INSERT INTO "books" ("title", "year_published", "author", "price")
 VALUES ('Собачье сердце', 1999, 'Михаил Булгаков', 250);
-
+```
 ##### Вставляем информацию об издательствах
-
+```sql
 INSERT INTO "publishers" ("name", "city")
 VALUES ('Питер', 'СПб.');
 
@@ -292,11 +313,20 @@ VALUES ('Радуга', 'М.');
 
 INSERT INTO "publishers" ("name", "city")
 VALUES ('Художественная литература. Москва', 'М.');
-
-1. SELECT * FROM "books" WHERE "author" = 'Михаил Булгаков';
-
-2. SELECT * FROM "books" WHERE "price" <= 500;
-
-3. SELECT "books"."title", "books"."year_published" FROM "books" WHERE "author" = 'Иван Тургенев';
-
-4. SELECT "books"."author" FROM "books" WHERE "year_published" >= 1990 AND "year_published" < 2000 GROUP BY "author";
+```
+1.Все книги автора - Михаил Булгаков
+```sql 
+SELECT * FROM "books" WHERE "author" = 'Михаил Булгаков';
+```
+2. Все книги ценой не более 500 рублей
+```sql
+SELECT * FROM "books" WHERE "price" <= 500;
+```
+3.Заглавия книг и год издания автора - Иван Тургенев, отсортированные по дате публикации, в двух вариантах - по возрастанию(по умолчанию)
+ ```sql
+SELECT "books"."title", "books"."year_published" FROM "books" WHERE "author" = 'Иван Тургенев';
+```
+4. Имена авторов книг вышедших в с 1990 по 1999 годы (включительно). Применена группировка, чтобы получить список без повторов
+ ```sql
+SELECT "books"."author" FROM "books" WHERE "year_published" >= 1990 AND "year_published" < 2000 GROUP BY "author";
+```
