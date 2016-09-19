@@ -326,7 +326,7 @@ SELECT * FROM "books" WHERE "price" <= 500;
 ```sql
 SELECT "books"."title", "books"."year_published" FROM "books" WHERE "author" = 'Иван Тургенев';
 ```
- `4.` ol Имена авторов книг вышедших в с 1990 по 1999 годы (включительно). Применена группировка, чтобы получить список без повторов
+ `4.` Имена авторов книг вышедших в с 1990 по 1999 годы (включительно). Применена группировка, чтобы получить список без повторов
 
 ```sql
 SELECT "books"."author" FROM "books" WHERE "year_published" >= 1990 AND "year_published" < 2000 GROUP BY "author";
