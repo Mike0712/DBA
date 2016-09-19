@@ -8,7 +8,7 @@
 При созании столбцов, в основных столбцах включая id был указан доп параметр NOT NULL (поле не должно быть пустым).
 Если при добавлении записи соответствующее поле будет пустым, то произойдет ошибка. Этим я обоначаю, что соответствующая
 колонка записи обязательна для заполнения
-
+```sql
 CREATE TABLE `books` (
   `id` integer NOT NULL PRIMARY KEY AUTOINCREMENT,
   `title` text(500) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `publishers` (
   `name` text(255) NOT NULL,
   `city` text(255) NOT NULL
 );
-
+```
 ##### Вставляем данные в таблицу books
 
 INSERT INTO `books` (`title`, `year_published`, `year_written`, `author`, `price`)
