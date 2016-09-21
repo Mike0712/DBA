@@ -3,9 +3,7 @@
 ## Урок 2.
 
 ## Создаём таблицу c названием goods:
-`Основные отличия от других БД: Вместо decimal в MySql используем numeric. Хотя в MySql тоже есть numeric синоним decimal,
-однако в PostreeSql нет типа decimal - сиснонима numeric. Кроме того, в PostreeSql нет директивы unsigned для ограничения
-целочисленных значений, поэтому мы задаём это явно.`
+
 ```sql
     CREATE TABLE "goods" ("id" serial, "title" varchar(255),
     "description" text,
@@ -17,3 +15,6 @@
     "quantity" smallint CHECK ("quantity" > 0),
     "exists" boolean DEFAULT false);
 ```
+Основные отличия от других БД: Вместо decimal в MySql используем numeric. Хотя в MySql тоже есть numeric синоним decimal,
+однако в PostreeSql нет типа decimal - сиснонима numeric. Кроме того, в PostreeSql нет директивы unsigned для ограничения
+целочисленных значений, поэтому мы задаём это явно.
