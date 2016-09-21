@@ -16,5 +16,5 @@
     "exists" boolean DEFAULT false);
 ```
 Основные отличия от других БД: Вместо decimal в MySql используем numeric. Хотя в MySql тоже есть numeric синоним decimal,
-однако в PostreeSql нет типа decimal - сиснонима numeric. Кроме того, в PostreeSql нет директивы unsigned для ограничения
+однако в PostreeSql нет типа decimal - синонима numeric. Кроме того, в PostreeSql нет директивы unsigned для ограничения
 целочисленных значений, поэтому мы задаём это явно.
