@@ -82,5 +82,4 @@ VALUES ('Jamis XENITH PRO',
 NOT NULL constraint failed: goods.price
 ```
 #### Все работает ожидаемо
-###И конечно же стоит отметить, что sqlite поддерживает поле timestamp и директива DEFAULT CURRENT_TIMESTAMP прекрасно отработала, вставив в
-поля время создания записей.
+###И конечно же стоит отметить, что sqlite поддерживает поле timestamp и директива DEFAULT CURRENT_TIMESTAMP прекрасно отработала, вставив в поля время создания записей.
