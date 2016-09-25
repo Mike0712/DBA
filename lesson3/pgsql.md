@@ -42,7 +42,9 @@ SELECT * FROM "goods" ORDER BY "price" LIMIT 10
 ```
 Запрос занял (0.003 s)
 `3`. Выбираем 10 товаров, цена на которых была максимально снижена (в абсолютном или относительном смысле)
-
+```sql
+SELECT *, "old_price"-"price" AS "discount" FROM "goods" ORDER BY "old_price"-"price" DESC LIMIT 10
+```
 `4`. Выбираем те товары, чей артикул начинается с символов "test"
 
 
