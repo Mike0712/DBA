@@ -46,3 +46,37 @@ ADD UNIQUE `vendor_code` (`vendor_code`);
 свою работу.
 Всё, таблица заполнена.
 
+`1.` Выбираем 10 самых новых товаров:
+```sql
+SELECT * FROM `goods` ORDER BY `warehouse_date` DESC LIMIT 10
+```
+Запрос занял 0.0737 сек.
+Делаем explain и получаем, что в переборке участвуют все 999 записей.
+
+Вешаем индекс:
+```sql
+ALTER TABLE `goods` ADD INDEX idate(`warehouse_date` DESC);
+```
+Повторяем запрос - Запрос занял 0.0033 сек.
+
+`2`. Выбираем 10 самых дешевых товаров
+```sql
+SELECT * FROM `goods` ORDER BY `price` LIMIT 10
+```
+Запрос занял 0.0031 сек
+
+Вешаем индекс на поле price:
+```sql
+ALTER TABLE `goods` ADD INDEX price(`price`);
+```
+Повторяем запрос:
+Запрос занял 0.0003 сек
+
+```sql
+SELECT * FROM `goods` WHERE `vendor_code` LIKE '%test%'
+```
+
+```sql
+ALTER TABLE `goods` ADD INDEX vendor(`vendor_code`);
+```
+Запрос занял 0.0037
