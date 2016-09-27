@@ -38,11 +38,12 @@ SELECT * FROM "goods" ORDER BY "warehouse_date" DESC LIMIT 10
 ```
 Total query runtime: 13 msec
 Делаем EXPLAIN запроса, получаем:
-
-"Limit  (cost=44.58..44.60 rows=10 width=60)"
-"  ->  Sort  (cost=44.58..47.08 rows=999 width=60)"
-"        Sort Key: warehouse_date DESC"
-"        ->  Seq Scan on goods  (cost=0.00..22.99 rows=999 width=60)"
+```sql
+Limit  (cost=1455.18..1455.21 rows=10 width=64)
+  ->  Sort  (cost=1455.18..1537.93 rows=33097 width=64)
+        Sort Key: warehouse_date DESC
+        ->  Seq Scan on goods  (cost=0.00..739.97 rows=33097 width=64)
+      ```  
 Вешаем индекс на поле "warehouse_date":
 ```sql
 CREATE INDEX "goods_warehouse_date" ON "goods" ("warehouse_date");
@@ -50,8 +51,8 @@ CREATE INDEX "goods_warehouse_date" ON "goods" ("warehouse_date");
 Повторяем запрос:
 Total query runtime: 12 msec
 ```sql
-"Limit  (cost=0.28..1.15 rows=10 width=60)"
-"  ->  Index Scan Backward using goods_warehouse_date on goods  (cost=0.28..87.24 rows=999 width=60)"
+Limit  (cost=0.29..1.05 rows=10 width=64)
+  ->  Index Scan Backward using goods_warehouse_date on goods  (cost=0.29..2504.74 rows=33097 width=64)
 ```
 Меняем наш индекс, делая сортировку по убыванию:
 ```sql
@@ -81,32 +82,63 @@ CREATE INDEX "goods_price" ON "goods" ("price");
 Повторяем запрос:
 Total query runtime: 12 msec
 Эксплейним:
-"Limit  (cost=0.28..1.15 rows=10 width=60)"
-"  ->  Index Scan using goods_price on goods  (cost=0.28..87.26 rows=999 width=60)"
+```sql
+Limit  (cost=0.29..1.05 rows=10 width=64)
+  ->  Index Scan using goods_price on goods  (cost=0.29..2504.74 rows=33097 width=64)
+```
 
 `3`. Выбираем 10 товаров, цена на которых была максимально снижена (в абсолютном или относительном смысле)
 ```sql
 SELECT *, "old_price"-"price" AS "discount" FROM "goods" ORDER BY "old_price"-"price" DESC LIMIT 10
 ```
-Total query runtime: 15 msec.
+Total query runtime: 22 msec.
 Explain:
 ```sql
-"Limit  (cost=47.08..47.10 rows=10 width=60)"
-"  ->  Sort  (cost=47.08..49.57 rows=999 width=60)"
-"        Sort Key: ((old_price - price)) DESC"
-"        ->  Seq Scan on goods  (cost=0.00..25.49 rows=999 width=60)"
+QUERY PLAN
+Limit  (cost=1537.93..1537.95 rows=10 width=64)
+  ->  Sort  (cost=1537.93..1620.67 rows=33097 width=64)
+        Sort Key: ((old_price - price)) DESC
+        ->  Seq Scan on goods  (cost=0.00..822.71 rows=33097 width=64
 ```
+Создаём индекс:
+```sql
+CREATE INDEX "goods_old_price" ON "goods" ("old_price");
+```
+Total query runtime: 22 msec.
+Смотрим explain.
+ ```sql
+QUERY PLAN
+Limit  (cost=1537.93..1537.95 rows=10 width=64)
+  ->  Sort  (cost=1537.93..1620.67 rows=33097 width=64)
+        Sort Key: ((old_price - price)) DESC
+        ->  Seq Scan on goods  (cost=0.00..822.71 rows=33097 width=64
+        ```
+К сожалению данный индекс не сработал.
+
 
 `4`. Выбираем те товары, чей артикул начинается с символов "test"
 ```sql
-SELECT * FROM "goods" WHERE "vendor_code" LIKE '%test%'
+SELECT * FROM "goods" WHERE "vendor_code" LIKE 'test%'
 ```
-Запрос занял (0.003 s)
+Запрос занял (85 msec)
 
 Делаем EXPLAIN запроса, получаем следующую информацию:
 
 ```sql
 QUERY PLAN
 Seq Scan on goods  (cost=0.00..25.49 rows=61 width=60)
+  Filter: (vendor_code ~~ 'test%'::text)
+```
+Вешаем индекс:
+```sql
+CREATE INDEX "goods_vaendor_idx" ON "goods" ("vendor_code")
+```
+
+Повторяем запрос: 
+Запрос занял (85 msec)
+Смотрим EXPLAIN: 
+```sql 
+QUERY PLAN
+Seq Scan on goods  (cost=0.00..822.71 rows=1003 width=64)
   Filter: (vendor_code ~~ 'test%'::text)
 ```
