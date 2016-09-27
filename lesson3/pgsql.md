@@ -29,15 +29,15 @@ ADD CONSTRAINT "goods_vendor_code" UNIQUE ("vendor_code");
 ```
 Ну и наполняем данными, при помощи скрипта, выбирая пункт 'Вставить данные для PostgreSql'.
 Обратим внимание, что PostgreSql обрабатывает запрос несколько дольше, чем Mysql
-Итак, 1000 записей было добавлено в таблицу.
+Итак, более 33000 записей было добавлено в таблицу.
 Выполняем запросы.
 
 `1.` Выбираем 10 самых новых товаров:
 ```sql
-SELECT * FROM "goods" WHERE "warehouse_date" > ORDER BY "warehouse_date" DESC LIMIT 10
+SELECT * FROM "goods" ORDER BY "warehouse_date" DESC LIMIT 10
 ```
-Total query runtime: 25 msec
-Делаем EPLAIN запроса, получаем:
+Total query runtime: 13 msec
+Делаем EXPLAIN запроса, получаем:
 
 "Limit  (cost=44.58..44.60 rows=10 width=60)"
 "  ->  Sort  (cost=44.58..47.08 rows=999 width=60)"
@@ -48,8 +48,7 @@ Total query runtime: 25 msec
 CREATE INDEX "goods_warehouse_date" ON "goods" ("warehouse_date");
 ```
 Повторяем запрос:
-Total query runtime: 100 msec. Т.е. время на выполнение запроса даже увеличилось.
-Делаем EXPLAIN и получаем в ответ:
+Total query runtime: 12 msec
 ```sql
 "Limit  (cost=0.28..1.15 rows=10 width=60)"
 "  ->  Index Scan Backward using goods_warehouse_date on goods  (cost=0.28..87.24 rows=999 width=60)"

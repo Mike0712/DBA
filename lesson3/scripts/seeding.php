@@ -16,9 +16,10 @@ while ($i <= 200000) {
     if($i%13 === 0){
         $data[$i-1]['vendor_code'] = 'test'.$data[$i-1]['vendor_code'];
     }
-    $i++;
+    
     if ($data[$i-1]['price'] > $data[$i-1]['old_price']){
         $data[$i-1]['old_price'] = null;
     }
+    $i++;
 }
 return $data;
