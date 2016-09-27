@@ -105,18 +105,19 @@ Limit  (cost=1537.93..1537.95 rows=10 width=64)
 CREATE INDEX "goods_old_price" ON "goods" ("old_price");
 ```
 Total query runtime: 22 msec.
-Смотрим explain.
- ```sql
+Смотрим explain:
+
 QUERY PLAN
 Limit  (cost=1537.93..1537.95 rows=10 width=64)
   ->  Sort  (cost=1537.93..1620.67 rows=33097 width=64)
         Sort Key: ((old_price - price)) DESC
         ->  Seq Scan on goods  (cost=0.00..822.71 rows=33097 width=64
-        ```
+
 К сожалению данный индекс не сработал.
 
 
 `4`. Выбираем те товары, чей артикул начинается с символов "test"
+
 ```sql
 SELECT * FROM "goods" WHERE "vendor_code" LIKE 'test%'
 ```
@@ -142,3 +143,8 @@ QUERY PLAN
 Seq Scan on goods  (cost=0.00..822.71 rows=1003 width=64)
   Filter: (vendor_code ~~ 'test%'::text)
 ```
+
+
+Признаюсь честно, тему работы индексов на PgSql этой домашкой я сам для себя не раскрыл. Полагаю, что виной тому
+малое количество записей в таблице. К сожалению, пока не придумал способа быстро забить БД PostgreSql большим количеством
+записей.
