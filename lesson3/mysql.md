@@ -72,6 +72,27 @@ ALTER TABLE `goods` ADD INDEX price(`price`);
 Повторяем запрос:
 Запрос занял 0.0003 сек
 
+`3`. Выбираем 10 товаров, цена на которых была максимально снижена (в абсолютном или относительном смысле)
+```sql
+SELECT `title`,`old_price`-`price` AS `discount` FROM `goods` WHERE `old_price` > `price` ORDER BY `old_price`-`price` DESC LIMIT 10
+```
+Запрос занял 0.0016 сек.
+
+EXPLAIN: rows 999
+Создаём индекс сразу для двух полей:
+```sql
+ALTER TABLE `goods` ADD INDEX diff(`price`, `old_price`);
+```
+Повторяем запрос
+Запрос занял 0.0038 сек.
+Делаем explain и видим, что индекс не сработал.
+Пробуем другой индекс
+```sql
+`ALTER TABLE `goods` DROP INDEX diff;
+
+ALTER TABLE `goods` ADD INDEX idx_fields(`price`, `old_price` DESC);
+```
+
 ```sql
 SELECT * FROM `goods` WHERE `vendor_code` LIKE '%test%'
 ```
