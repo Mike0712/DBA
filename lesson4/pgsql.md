@@ -1,150 +1,158 @@
-# MySql
+# PostgreSql
 
-## Урок 3.
+## Урок 4.
 
-## Создаём таблицу c названием goods, также без индексов:
-
+Очистим таблицу "goods", поскольку в ней появятся новые поля, а мы будем использовать таблицы с помощью скрипта
 ```sql
-CREATE TABLE "goods" (  "id" serial,
-                        "title" varchar(255),
-                        "vendor_code" char(9) NOT NULL,
-                        "image_url" varchar(255),
-                        "price" integer NOT NULL CHECK("price" >= 0),
-                        "old_price" integer NULL CHECK("old_price" > 0),
-                        "warehouse_date" timestamptz DEFAULT now(),
-                        "quantity" smallint);
+TRUNCATE TABLE "goods"
 ```
-Как видим, тип serial не создает каких либо ключей по умолчанию, как в mysql. Последовательность + автоинкремент
-уже гарантрует уникальность значения этого поля.
-
-Создаём первичный ключ для поля id:
+Создадим в таблице новые поля:
 ```sql
 ALTER TABLE "goods"
-ADD CONSTRAINT "goods_id" PRIMARY KEY ("id");
+ADD "category_id" integer NULL;
 ```
-и уникальный для артикула:
+
 ```sql
 ALTER TABLE "goods"
-ADD CONSTRAINT "goods_vendor_code" UNIQUE ("vendor_code");
-```
-Ну и наполняем данными, при помощи скрипта, выбирая пункт 'Вставить данные для PostgreSql'.
-Обратим внимание, что PostgreSql обрабатывает запрос несколько дольше, чем Mysql
-Итак, более 33000 записей было добавлено в таблицу.
-Выполняем запросы.
-
-`1.` Выбираем 10 самых новых товаров:
-```sql
-SELECT * FROM "goods" ORDER BY "warehouse_date" DESC LIMIT 10
-```
-Total query runtime: 13 msec
-Делаем EXPLAIN запроса, получаем:
-```sql
-Limit  (cost=1455.18..1455.21 rows=10 width=64)
-  ->  Sort  (cost=1455.18..1537.93 rows=33097 width=64)
-        Sort Key: warehouse_date DESC
-        ->  Seq Scan on goods  (cost=0.00..739.97 rows=33097 width=64)
-      ```  
-Вешаем индекс на поле "warehouse_date":
-```sql
-CREATE INDEX "goods_warehouse_date" ON "goods" ("warehouse_date");
-```
-Повторяем запрос:
-Total query runtime: 12 msec
-```sql
-Limit  (cost=0.29..1.05 rows=10 width=64)
-  ->  Index Scan Backward using goods_warehouse_date on goods  (cost=0.29..2504.74 rows=33097 width=64)
-```
-Меняем наш индекс, делая сортировку по убыванию:
-```sql
-DROP INDEX "goods_warehouse_date";
-CREATE INDEX "goods_warehouse_date" ON "goods" ("warehouse_date" DESC);
-```
-Повторяем запрос и получаем результат:
-Total query runtime: 12 msec.
-```sql
-EXPLAIN SELECT * FROM "goods" ORDER BY "warehouse_date" DESC LIMIT 10
-
-"Limit  (cost=0.28..1.15 rows=10 width=60)"
-"  ->  Index Scan using goods_warehouse_date on goods  (cost=0.28..87.24 rows=999 width=60)"
-```
-Таким образом, для данного запроса оказалось важным чтобы направление сортировки в индексе совпадало с направлением
-сортировки в запросе, тогда это даёт профит.
-`2`. Выбираем 10 самых дешевых товаров
-```sql
-SELECT * FROM "goods" ORDER BY "price" LIMIT 10
-```
-Total query runtime: 13 msec
-
-Вешаем индекс на поле price:
-```sql
-CREATE INDEX "goods_price" ON "goods" ("price");
-```
-Повторяем запрос:
-Total query runtime: 12 msec
-Эксплейним:
-```sql
-Limit  (cost=0.29..1.05 rows=10 width=64)
-  ->  Index Scan using goods_price on goods  (cost=0.29..2504.74 rows=33097 width=64)
+ADD "brand_id" integer NULL;
 ```
 
-`3`. Выбираем 10 товаров, цена на которых была максимально снижена (в абсолютном или относительном смысле)
+Далее создаём таблицы
 ```sql
-SELECT *, "old_price"-"price" AS "discount" FROM "goods" ORDER BY "old_price"-"price" DESC LIMIT 10
-```
-Total query runtime: 22 msec.
-Explain:
-```sql
-QUERY PLAN
-Limit  (cost=1537.93..1537.95 rows=10 width=64)
-  ->  Sort  (cost=1537.93..1620.67 rows=33097 width=64)
-        Sort Key: ((old_price - price)) DESC
-        ->  Seq Scan on goods  (cost=0.00..822.71 rows=33097 width=64
-```
-Создаём индекс:
-```sql
-CREATE INDEX "goods_old_price" ON "goods" ("old_price");
-```
-Total query runtime: 22 msec.
-Смотрим explain:
-
-QUERY PLAN
-Limit  (cost=1537.93..1537.95 rows=10 width=64)
-  ->  Sort  (cost=1537.93..1620.67 rows=33097 width=64)
-        Sort Key: ((old_price - price)) DESC
-        ->  Seq Scan on goods  (cost=0.00..822.71 rows=33097 width=64
-
-К сожалению данный индекс не сработал.
-
-
-`4`. Выбираем те товары, чей артикул начинается с символов "test"
-
-```sql
-SELECT * FROM "goods" WHERE "vendor_code" LIKE 'test%'
-```
-Запрос занял (85 msec)
-
-Делаем EXPLAIN запроса, получаем следующую информацию:
-
-```sql
-QUERY PLAN
-Seq Scan on goods  (cost=0.00..25.49 rows=61 width=60)
-  Filter: (vendor_code ~~ 'test%'::text)
-```
-Вешаем индекс:
-```sql
-CREATE INDEX "goods_vaendor_idx" ON "goods" ("vendor_code")
-```
-
-Повторяем запрос: 
-Запрос занял (85 msec)
-Смотрим EXPLAIN: 
-```sql 
-QUERY PLAN
-Seq Scan on goods  (cost=0.00..822.71 rows=1003 width=64)
-  Filter: (vendor_code ~~ 'test%'::text)
+CREATE TABLE "category" ("id" serial, "title" varchar(100), CONSTRAINT "category_id" PRIMARY KEY ("id"));
 ```
 
 
-Признаюсь честно, тему работы индексов на PgSql этой домашкой я сам для себя не раскрыл. Полагаю, что виной тому
-малое количество записей в таблице. К сожалению, пока не придумал способа быстро забить БД PostgreSql большим количеством
-записей.
+```sql
+CREATE TABLE "brands" ("id" serial, "brand" varchar(100), CONSTRAINT "brand_id" PRIMARY KEY ("id"));
+```
+
+Добавим внешние ключи в таблицу "goods"
+```sql
+ALTER TABLE "goods"
+ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id")
+```
+```sql
+ALTER TABLE "goods"
+ADD FOREIGN KEY ("brand_id") REFERENCES "brands" ("id")
+```
+Теперь попробуем вставить какую-нибудь запись в таблицу goods.
+```sql
+ INSERT INTO "goods" ("title", "vendor_code", "image_url", "price", "old_price", "warehouse_date", "quantity", "category_id", "brand_id")
+ VALUES ('rgrtg', '53636', 'dfbdnhg', '36377', '33333', 'now()', '1', '1', '1');
+```
+И получаем ошибку:
+
+ERROR: insert or update on table "goods" violates foreign key constraint "goods_category_id_fkey"
+DETAIL: Key (category_id)=(1) is not present in table "category"
+
+Как видим, сработало ограничение. Мы не можем добавлять что-либо в поля таблицы, если они связаны внешними ключами с
+другими таблицами, до тех пор пока в этих таблицах не появятся соответствующие записи.
+
+Вставим в таблицу "category" данными:
+```sql
+INSERT INTO "category" ("title") VALUES ('Велосипеды');
+INSERT INTO "category" ("title") VALUES ('Покрышки');
+INSERT INTO "category" ("title") VALUES ('Камеры');
+INSERT INTO "category" ("title") VALUES ('Шлемы');
+INSERT INTO "category" ("title") VALUES ('Световые приборы');
+INSERT INTO "category" ("title") VALUES ('Бутылки и питьевые системы');
+INSERT INTO "category" ("title") VALUES ('Сумки');
+INSERT INTO "category" ("title") VALUES ('Куртки');
+INSERT INTO "category" ("title") VALUES ('Джерси');
+INSERT INTO "category" ("title") VALUES ('Шорты');
+
+```
+
+Наполним таблицу "brands" данными:
+
+```sql
+INSERT INTO "brands" ("brand") VALUES ('Shimano');
+INSERT INTO "brands" ("brand") VALUES ('Hope');
+INSERT INTO "brands" ("brand") VALUES ('Kona');
+INSERT INTO "brands" ("brand") VALUES ('Author');
+INSERT INTO "brands" ("brand") VALUES ('Maloja');
+INSERT INTO "brands" ("brand") VALUES ('Michelin');
+INSERT INTO "brands" ("brand") VALUES ('Mongoose');
+INSERT INTO "brands" ("brand") VALUES ('Nike');
+```
+
+Запустим скрипт для заполнения таблицы goods.
+
+Проверим работу внешних ключей:
+Попробуем удалить запись в таблице brands
+```sql
+DELETE FROM "brands"
+WHERE (("id" = '8'));
+```
+В ответ плучаем:
+Cannot delete or update a parent row: a foreign key constraint fails (`dba`.`goods`, CONSTRAINT `goods_ibfk_3`
+FOREIGN KEY (`brand_id`) REFERENCES `category` (`id`) ON UPDATE CASCADE).
+
+Пробуем изменить
+```sql
+UPDATE "brand" SET
+"id" = '8'
+WHERE "id" = '9';
+```
+И получаем:
+ ERROR: update or delete on table "brands" violates foreign key constraint "goods_brand_id_fkey" on table "goods"
+ DETAIL: Key (id)=(8) is still referenced from table "goods".
+
+Внешние ключи работают.
+
+Но необходимо добавить экшны - запрет на удаление и каскад на обновление
+```sql
+ALTER TABLE "goods"
+DROP CONSTRAINT "goods_brand_id_fkey",
+ADD FOREIGN KEY ("brand_id") REFERENCES "brands" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+```
+```sql
+ALTER TABLE "goods"
+DROP CONSTRAINT "goods_category_id_fkey",
+ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+```
+
+Выполняем запросы:
+1. Выберем все товары с указанием их категории и бренда.
+```sql
+SELECT * FROM "goods" INNER JOIN "category" ON "goods"."category_id" = "category"."id"
+                      INNER JOIN "brands" ON "goods"."brand_id" = "brands"."id"  ;
+```
+
+2. Выберем все товары, бренд которых начинается на букву "А"
+```sql
+SELECT * FROM "goods" INNER JOIN "category" ON "goods"."category_id" = "category"."id"
+                      INNER JOIN "brands" ON "goods"."brand_id" = "brands"."id"
+                      WHERE "brands"."brand" LIKE 'A%'
+                      ;
+```
+
+3.Выведем список категорий и число товаров в каждой (используйте подзапросы и функцию COUNT(), использовать группировку нельзя)
+```sql
+SELECT "category"."title",
+    (
+        SELECT count(*) FROM "goods"
+        WHERE "goods"."category_id" = "category"."id"
+    ) AS "count"
+FROM "category";
+```
+
+Получили следующий результат
+
+title	count
+Шлемы	42
+Световые приборы	56
+Бутылки и питьевые системы	52
+Сумки	56
+Куртки	46
+Джерси	48
+Шорты	48
+Велосипеды	47
+Покрышки	56
+Камеры	50
+
+4. Выберем для каждой категории список брендов товаров, входящих в нее:
+```sql
+
+```
