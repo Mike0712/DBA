@@ -137,7 +137,7 @@ FROM `category`;
 `4.` Выберем для каждой категории список брендов товаров, входящих в нее:
 (к сожалению не  догадался, как это можно сделать без группировки)
 ```sql
-SELECT `category`.`title`, GROUP_CONCAT(DISTINCT `brands`.`brand` SEPARATOR ',')
+SELECT `category`.`title`, GROUP_CONCAT(DISTINCT `brands`.`brand` SEPARATOR ',') AS `brands`
 	FROM `category`
 	INNER JOIN `goods` ON `goods`.`category_id` = `category`.`id`
     INNER JOIN `brands` ON `brands`.`id`= `goods`.`brand_id`
