@@ -114,13 +114,13 @@ ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id") ON DELETE RESTRICT 
 ```
 
 Выполняем запросы:
-1. Выберем все товары с указанием их категории и бренда.
+`1.` Выберем все товары с указанием их категории и бренда.
 ```sql
 SELECT * FROM "goods" INNER JOIN "category" ON "goods"."category_id" = "category"."id"
                       INNER JOIN "brands" ON "goods"."brand_id" = "brands"."id"  ;
 ```
 
-2. Выберем все товары, бренд которых начинается на букву "А"
+`2.` Выберем все товары, бренд которых начинается на букву "А"
 ```sql
 SELECT * FROM "goods" INNER JOIN "category" ON "goods"."category_id" = "category"."id"
                       INNER JOIN "brands" ON "goods"."brand_id" = "brands"."id"
@@ -128,7 +128,7 @@ SELECT * FROM "goods" INNER JOIN "category" ON "goods"."category_id" = "category
                       ;
 ```
 
-3.Выведем список категорий и число товаров в каждой (используйте подзапросы и функцию COUNT(), использовать группировку нельзя)
+`3.`Выведем список категорий и число товаров в каждой (используйте подзапросы и функцию COUNT(), использовать группировку нельзя)
 ```sql
 SELECT "category"."title",
     (
@@ -151,8 +151,3 @@ title	count
 Велосипеды	47
 Покрышки	56
 Камеры	50
-
-4. Выберем для каждой категории список брендов товаров, входящих в нее:
-```sql
-
-```

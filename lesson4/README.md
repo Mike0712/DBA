@@ -4,5 +4,5 @@
 
 ## [pgsql]
 
-[mysql]:/lesson3/mysql.md
-[pgsql]:/lesson3/pgsql.md
+[mysql]:/lesson4/mysql.md
+[pgsql]:/lesson4/pgsql.md

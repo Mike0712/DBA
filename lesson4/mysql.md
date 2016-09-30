@@ -103,7 +103,7 @@ WHERE `id` = '10';
 Внешние ключи работают.
 
 Выполняем запросы:
-1. Выберем все товары с указанием их категории и бренда.
+`1.` Выберем все товары с указанием их категории и бренда.
 ```sql
 SELECT * FROM `goods` INNER JOIN `category` ON `goods`.`category_id` = `category`.`id`
                       INNER JOIN `brands` ON `goods`.`brand_id` = `brands`.`id`  ;
@@ -116,7 +116,7 @@ SELECT * FROM `goods` LEFT JOIN `category` ON `goods`.`category_id` = `category`
 ```
 Всё ожидаемо.
 
-2. Выберем все товары, бренд которых начинается на букву "А"
+`2.` Выберем все товары, бренд которых начинается на букву "А"
 ```sql
 SELECT * FROM `goods` INNER JOIN `category` ON `goods`.`category_id` = `category`.`id`
                       INNER JOIN `brands` ON `goods`.`brand_id` = `brands`.`id`
@@ -125,7 +125,7 @@ SELECT * FROM `goods` INNER JOIN `category` ON `goods`.`category_id` = `category
 ```
 Получили 71 товар с брендом Author. Собственно у меня в наличии только один бренд, начинающийся с буквы A.
 
-3.Выведем список категорий и число товаров в каждой (используйте подзапросы и функцию COUNT(), использовать группировку нельзя)
+`3.`Выведем список категорий и число товаров в каждой (используйте подзапросы и функцию COUNT(), использовать группировку нельзя)
 ```sql
 SELECT `category`.`title`,
     (
@@ -134,7 +134,12 @@ SELECT `category`.`title`,
     ) AS `count`
 FROM `category`;
 ```
-4. Выберем для каждой категории список брендов товаров, входящих в нее:
+`4.` Выберем для каждой категории список брендов товаров, входящих в нее:
+(к сожалению не  догадался, как это можно сделать без группировки)
 ```sql
-
+SELECT `category`.`title`, GROUP_CONCAT(DISTINCT `brands`.`brand` SEPARATOR ',')
+	FROM `category`
+	INNER JOIN `goods` ON `goods`.`category_id` = `category`.`id`
+    INNER JOIN `brands` ON `brands`.`id`= `goods`.`brand_id`
+    GROUP BY `category`.`title`;
 ```

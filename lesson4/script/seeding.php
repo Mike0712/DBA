@@ -1,7 +1,7 @@
 <?php
 $i = 1;
 
-while ($i <= 501) {
+while ($i <= 500) {
 
     $data[] = [
         'title' => 'Товар' . $i,
