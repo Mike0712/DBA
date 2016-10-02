@@ -47,3 +47,25 @@ INSERT INTO `brands` (`brand`) VALUES ('Mongoose');
 INSERT INTO `brands` (`brand`) VALUES ('Nike');
 ```
 Вставим данные в таблицу goods. На этот раз я импортировал данные в формате csv.
+
+`1`. Делаем запрос, который выберет категории и среднюю цену товаров в каждой категории, при условии, что эта средняя
+цена менее 50000 рублей (выбираем "бюджетные" категории товаров).
+```sql
+SELECT `category`.`title`,
+AVG(`goods`.`price`) AS `middle_price`
+FROM `category`
+INNER JOIN `goods` ON `goods`.`category_id` = `category`.`id`
+GROUP BY `category`.`title`
+HAVING `middle_price` < 50000000
+```
+Сработало ожидаемо. 4 категории со средней ценой.
+`2`.Улучшим предыдущий запрос таким образом, чтобы в расчет средней цены включались только товары, имеющиеся на складе.
+```sql
+SELECT `category`.`title`,
+AVG(`goods`.`price`) AS `middle_price`
+FROM `category`
+INNER JOIN `goods` ON `goods`.`category_id` = `category`.`id`
+WHERE `goods`.`quantity` > 0
+GROUP BY `category`.`title`
+HAVING `middle_price` < 50000000
+```
