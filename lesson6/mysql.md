@@ -33,6 +33,7 @@ INSERT INTO `goods` (`title`, `vendor_code`, `image_url`, `price`, `old_price`, 
 VALUES ('Товар 501', '12435363', '/images/good501', '1231214657', NULL, now(), '45', '4', '6');
 ```
 Смотрим в таблицу history и видим там новую запись:
+
 |id |goods_id|action | price     | old_price  |datetime           |
 |---|--------|-------|-----------|------------|-------------------|
 | 1 | 501    | create| 1231214657|   NULL     |2016-10-05 22:39:31|
