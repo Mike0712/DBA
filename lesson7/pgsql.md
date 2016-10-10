@@ -144,7 +144,7 @@ DETAIL:  Failing row contains (1689, Товар1689, Вася.\-  , /images/good
 
 
 3 Ограничение на поле "есть на складе".
-Собственно говоря в моей таблице такого поля нет. Но это легко исправить.
+Собственно говоря в моей таблице соответствующей колонки нет. Но это легко исправить.
 ```sql
 ALTER TABLE "goods"
 ADD "presence" boolean DEFAULT 'false';
@@ -169,8 +169,43 @@ WHERE "quantity" > 0
 Теперь в поле "presence" можно добавить либо true либо false
 
 2) Установим ещё несколько ограничений:
+1 Ограничение на количество товара, оно так же не может быть отрицательным, но тем не менее может быть равным 0.
 
+ ```sql
+ ALTER TABLE "goods"
+  ADD CONSTRAINT "quantity_not_subzero" CHECK ("quantity" >= 0);
+ ```
 
+ Введём запрос:
+ ```sql
+ UPDATE "goods"
+ SET "quantity" = -1
+ WHERE "id" = 1557
+ ```
+Текст ошибки:
+```
+ERROR:  new row for relation "goods" violates check constraint "quantity_not_subzero"
+DETAIL:  Failing row contains (1557, Товар56, 00392    , /images/good56, 89632970, null, 2016-07-16 01:04:06+00, -1, 3, f, null)
+```
+2 Введем ограничение на поле image_url. Картинки могут браться только из папки /image. Допустим мы не хотим чтобы в это поле
+мог прийти внешний url, все картинки, используемые в приложении должны храниться на сервере.
+```sql
+ ALTER TABLE "goods"
+  ADD CONSTRAINT "inner_url" CHECK ("image_url" ~ '^/images/');
+```
+Проеверяем:
+
+```sql
+ UPDATE "goods"
+ SET "image_url" = 'https://www.instagram.com/user1231/images/superfoto.png'
+ WHERE "id" = 1557
+```
+Наше ограничение отлично сработало:
+
+```
+ERROR:  new row for relation "goods" violates check constraint "inner_url"
+DETAIL:  Failing row contains (1557, Товар56, 00392    , https://www.instagram.com/user1231/images/superfoto.png, 89632970, null, 2016-07-16 01:04:06+00, 0, 3, f, null)
+```
 
 3)
 Перепроектируем таблицу товаров, используя поле categories bigint[]:
