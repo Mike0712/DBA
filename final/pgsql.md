@@ -216,13 +216,13 @@ CREATE OR REPLACE FUNCTION categories_before_insert_func()
     RETURNS trigger AS
 $BODY$
 DECLARE
-    _lft            INTEGER;
+    _lft       INTEGER;
     _level          INTEGER;
-    _tmp_lft        INTEGER;
-    _tmp_rgt        INTEGER;
+    _tmp_lft   INTEGER;
+    _tmp_rgt  INTEGER;
     _tmp_level      INTEGER;
     _tmp_id         INTEGER;
-    _tmp_parent     INTEGER;
+    _tmp_parent  INTEGER;
 BEGIN
     PERFORM lock_categories(NEW.tree);
 -- Нельзя эти поля ручками ставить:
@@ -275,7 +275,7 @@ BEGIN
 -- Формируем развыв в дереве на месте вставки:
     UPDATE categories
         SET lft = lft + 
-            CASE WHEN lft > lft 
+            CASE WHEN lft >= _lft 
               THEN 2 
               ELSE 0 
             END,
@@ -528,7 +528,7 @@ CREATE TRIGGER categories_after_delete_tr
 ```
 
 
-Проверим как работает. Обнаружил пару ошибок, теперь тригеррные функции работают как часы. 
+Проверим как работает. Работает как часы. 
 Создадим заглавную категорию:
 
 ```sql
